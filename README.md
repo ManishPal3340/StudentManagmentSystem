@@ -29,7 +29,7 @@ This is a **Java console application** for managing student records using **JDBC
 | stddob      | VARCHAR(30)    |             | Student date of birth      |
 
 **SQL to create table manually:**
-```sql
+sql
 CREATE TABLE IF NOT EXISTS mystud111 (
     stdId VARCHAR(30) PRIMARY KEY,
     stdname VARCHAR(50),
