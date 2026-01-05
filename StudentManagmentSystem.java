@@ -1,6 +1,6 @@
 package ProjectDB;
 
-import java.sql.Connection;
+import java.sql.Connection; 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Scanner;
@@ -24,7 +24,8 @@ public class StudentManagmentSystem{
             System.out.println("3: Delete data");
             System.out.println("4: Update data");
             System.out.println("5: Fetch by ID");
-            System.out.println("6: Exit");
+            System.out.println("6 View all Student Record ");
+            System.out.println("7: Exit");
 
             int choice = sc.nextInt();
 
@@ -36,15 +37,23 @@ public class StudentManagmentSystem{
                     addStudent();
                     break;
                 case 3:
-                    deleteStudent();
+                	System.out.println("Enter student ID to delete:");
+                    String sid = sc.next();
+                    deleteStudent(sid);
                     break;
                 case 4:
                     updateStudent();
                     break;
                 case 5:
-                    fetchStudentSingleDetail();
+                	  System.out.println("Enter student ID to fetch:");
+                      String sid1 = sc.next();
+                    fetchStudentSingleDetail(sid1);
                     break;
+                    
                 case 6:
+                	viewAllStudent();
+                	break;
+                case 7:
                     System.out.println("Thank you 😊");
                     System.exit(0);
                 default:
@@ -53,7 +62,36 @@ public class StudentManagmentSystem{
         }
     }
 
-    // Create table
+    public void viewAllStudent() {
+
+        String qur = "SELECT * FROM mystud111";
+
+        try (Connection conn = DBConnection.dbConnect();
+             PreparedStatement ps = conn.prepareStatement(qur);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (!rs.next()) {
+                System.out.println("No student records found.");
+            } else {
+                System.out.println("\n---- All Student Records ----");
+
+                do {
+                    System.out.println("----------------------------");
+                    System.out.println("ID   : " + rs.getString("stdId"));
+                    System.out.println("Name : " + rs.getString("stdname"));
+                    System.out.println("Email: " + rs.getString("stdmail"));
+                    System.out.println("DOB  : " + rs.getString("stddob"));
+                } while (rs.next());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        
+    }
+
+	// Create table
     public void createTable() {
         String qur = "CREATE TABLE IF NOT EXISTS mystud111 ("
                 + "stdId VARCHAR(30) PRIMARY KEY,"
@@ -112,14 +150,16 @@ public class StudentManagmentSystem{
     }
 
     // Delete student
-    public void deleteStudent() {
+    public void deleteStudent(String sid) {
+    	//viewAllStudent();
         String qur = "DELETE FROM mystud111 WHERE stdId=?";
+        fetchStudentSingleDetail(sid);
+        
 
         try (Connection conn = DBConnection.dbConnect();
              PreparedStatement psmt = conn.prepareStatement(qur)) {
 
-            System.out.println("Enter student ID to delete:");
-            String sid = sc.next();
+            
 
             psmt.setString(1, sid);
             int rowsDeleted = psmt.executeUpdate();
@@ -137,6 +177,7 @@ public class StudentManagmentSystem{
 
     // Update student
     public void updateStudent() {
+    	
         String qur = "UPDATE mystud111 SET stdname=?, stdmail=?, stddob=? WHERE stdId=?";
 
         try (Connection conn = DBConnection.dbConnect();
@@ -175,14 +216,13 @@ public class StudentManagmentSystem{
     }
 
     // Fetch single student details
-    public void fetchStudentSingleDetail() {
+    public void fetchStudentSingleDetail(String sid) {
         String qur = "SELECT * FROM mystud111 WHERE stdId=?";
 
         try (Connection conn = DBConnection.dbConnect();
              PreparedStatement psmt = conn.prepareStatement(qur)) {
 
-            System.out.println("Enter student ID to fetch:");
-            String sid = sc.next();
+          
 
             psmt.setString(1, sid);
             ResultSet rs = psmt.executeQuery();
